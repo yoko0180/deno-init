@@ -1,29 +1,45 @@
-import { fromFileUrl, dirname, join } from "https://deno.land/std@0.78.0/path/mod.ts"
-import { copy } from "https://deno.land/std@0.192.0/fs/mod.ts"
 import { walk } from "https://deno.land/std@0.192.0/fs/walk.ts"
-
-const currentDir = dirname(fromFileUrl(import.meta.url))
-
-async function displayResultCommand() {
-  const command = new Deno.Command("fd", {
-    args: ["-H"],
-    stdout: "inherit",
-  })
-  // const { code, stdout, stderr } = await command.output();
-  await command.output()
-}
+import { fetchTransform } from "https://raw.githubusercontent.com/yoko0180/deno-fetch-transform/master/fetchTransform.ts"
+import { ensureDir } from "https://deno.land/std@0.192.0/fs/ensure_dir.ts"
 
 async function displayResult() {
   for await (const entry of walk(".")) {
     console.log(entry.path)
   }
 }
+type Context = Record<string, unknown>
 
-// Learn more at https://deno.land/manual/examples/module_metadata#concepts
+async function fetchOut(names: string[], context: Context) {
+  const p = []
+  for (const name of names) {
+    p.push(fetchOutSingle(name, context))
+  }
+  return await Promise.all(p)
+}
+
+async function fetchOutSingle(outfilename: string, context: Context) {
+  const outfile = await Deno.open(outfilename, { create: true, write: true })
+  const urlRoot = "https://github.com/yoko0180/deno-init/raw/master/templates/"
+  const url = urlRoot + outfilename
+  const w = outfile.writable
+  await fetchTransform(url, w, context)
+  w.close()
+}
+
+async function fetchOutTemplates() {
+  const context = {} // deno-initでは当てはめ要素なし
+  await ensureDir(".vscode")
+  const names = [
+    ".vscode/settings.json",
+    "deno.jsonc",
+    "main_bench.ts",
+    "main_test.ts",
+    "main.ts",
+  ]
+  await fetchOut(names, context)
+}
+
 if (import.meta.main) {
-  const src = join(currentDir, "templates")
-  const dst = "."
-  await copy(src, dst, { overwrite: true })
-
+  await fetchOutTemplates()
   await displayResult()
 }
