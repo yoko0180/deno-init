@@ -3,7 +3,7 @@
 deno-init command is generate vscode setting file for deno additional to deno init.
 
 .vscode/settings.json
-```
+```json
 {
   "deno.enable": true,
   "deno.unstable": true
