@@ -13,7 +13,7 @@ type FetchOut = {
 }
 
 async function fetchOutSingle({ urlRoot, outfilename, context }: FetchOutSingle) {
-  const outfile = await Deno.open(outfilename, { create: true, write: true })
+  const outfile = await Deno.open(outfilename, { create: true, write: true, truncate: true })
   const url = urlRoot + outfilename
   const w = outfile.writable
   await fetchTransform(url, w, context)
