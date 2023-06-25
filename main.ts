@@ -14,9 +14,9 @@ type CreateType = "mini" | "cli"
 
 if (import.meta.main) {
   await new Command()
-    .name("cliffy")
+    .name("deno-init")
     .version("0.1.0")
-    .description("Command line framework for Deno")
+    .description(" deno-init command is generate vscode setting file for deno additional to deno init.  ")
     .action(async (ops, ...args) => {
       const createType: string = await Select.prompt({
         message: "Create a Type",
