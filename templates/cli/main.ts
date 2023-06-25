@@ -1,17 +1,8 @@
-import { walk } from "https://deno.land/std@0.192.0/fs/walk.ts"
+
 import { Command } from "https://deno.land/x/cliffy@v0.25.7/command/mod.ts"
 import { Select } from "https://deno.land/x/cliffy@v0.25.7/prompt/select.ts"
-import { fetchMini } from "./fetch/mini.ts"
-import { fetchCli } from "./fetch/cli.ts"
 
-async function displayResult() {
-  for await (const entry of walk(".")) {
-    console.log(entry.path)
-  }
-}
-
-type CreateType = "mini" | "cli"
-
+// Learn more at https://deno.land/manual/examples/module_metadata#concepts
 if (import.meta.main) {
   await new Command()
     .name("cliffy")
@@ -22,12 +13,11 @@ if (import.meta.main) {
         message: "Create a Type",
         options: [
           "mini", "cli"
+          // { name: "mini", value: "mini" },
+          // { name: "cli", value: "cli" },
         ],
       })
-      
-      if (createType === "mini") { await fetchMini() }
-      if (createType === "cli") { await fetchCli() }
-      await displayResult()
+      console.log(createType);
     })
     .parse(Deno.args)
 }
